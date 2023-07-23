@@ -58,12 +58,8 @@ To use the trained drowsiness detection model on real-time video streams, follow
 ```python
 
 # Load the pre-trained EfficientNetB5 model
-backbone = tf.keras.applications.efficientnet.EfficientNetB5(
-    include_top = False,
-    weights='imagenet',
-    input_shape=(CONFIG["IM_SIZE"], CONFIG["IM_SIZE"], 3),
-    )
-backbone.trainable=False
+from tensorflow.keras.models import load_model
+model =  load_model('Driver_drowsiness_efficientnet.h5)
 
 ```
 
