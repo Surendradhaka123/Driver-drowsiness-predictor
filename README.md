@@ -1,7 +1,5 @@
 # Driver Drowsiness Detection using Transfer Learning with EfficientNetB5
 
-![Drowsiness Detection](https://example.com/path/to/drowsiness-detection-image.png)
-
 ## Table of Contents
 
 - [Introduction](#introduction)
@@ -10,7 +8,8 @@
 - [Usage](#usage)
 - [Model Training](#model-training)
 - [Evaluation](#evaluation)
-- 
+
+  
 ## Introduction
 
 Driver drowsiness detection using transfer learning with EfficientNetB5 is a deep learning-based application that aims to detect the drowsiness level of drivers from real-time video streams. The model utilizes transfer learning with the EfficientNetB5 architecture, pre-trained on a large image dataset, to achieve high accuracy in real-world scenarios.
