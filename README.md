@@ -10,9 +10,7 @@
 - [Usage](#usage)
 - [Model Training](#model-training)
 - [Evaluation](#evaluation)
-- [Contributing](#contributing)
-- [License](#license)
-
+- 
 ## Introduction
 
 Driver drowsiness detection using transfer learning with EfficientNetB5 is a deep learning-based application that aims to detect the drowsiness level of drivers from real-time video streams. The model utilizes transfer learning with the EfficientNetB5 architecture, pre-trained on a large image dataset, to achieve high accuracy in real-world scenarios.
@@ -69,63 +67,79 @@ model =  load_model('Driver_drowsiness_efficientnet.h5)
 import cv2
 
 # Assuming 'camera' is the camera object capturing video frames
-while True:
-    ret, frame = camera.read()
-    if not ret:
-        break
+multiple cascades: https://github.com/Itseez/opencv/tree/master/data/haarcascades
 
-    # Preprocess the frame if necessary (resize, normalize, etc.)
-    # ...
+            #https://github.com/Itseez/opencv/blob/master/data/haarcascades/haarcascade_frontalface_default.xml
+            face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
 
-    # Perform inference on the preprocessed frame
-    predictions = model.predict(frame)
+            #https://github.com/Itseez/opencv/blob/master/data/haarcascades/haarcascade_eye.xml
+            eye_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_eye.xml')
+            mixer.init()
+            sound= mixer.Sound(r'mixkit-digital-clock-digital-alarm-buzzer-992.wav')
+            cap = cv2.VideoCapture(0)
+            Score = 0
+            openScore = 0
+            while 1:
 
-    # Process predictions to determine drowsiness level
-    # ...
+                ret, img = cap.read()
+                height,width = img.shape[0:2]
+                frame = img
+                gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+                faces = face_cascade.detectMultiScale(gray, scaleFactor= 1.3, minNeighbors=2)
 
-    # Display the frame with drowsiness level indication
-    cv2.imshow('Drowsiness Detection', frame)
+                for (x,y,w,h) in faces:
+                    cv2.rectangle(img,(x,y),(x+w,y+h),(255,0,0),2)
+                    roi_gray = gray[y:y+h, x:x+w]
+                    roi_color = img[y:y+h, x:x+w]
+                    eye= img[y:y+h,x:x+w]
+                    eye= cv2.resize(eye, (256 ,256))
+                    im = tf.constant(eye, dtype = tf.float32)
+                    img_array = tf.expand_dims(im, axis = 0)
+                    prediction = model.predict(img_array)
+                    print(np.argmax(prediction[0]))
 
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
+                    # if eyes are closed
+                    if np.argmax(prediction[0])<0.50:
+                        cv2.putText(frame,'closed',(10,height-20),fontFace=cv2.FONT_HERSHEY_COMPLEX_SMALL,fontScale=1,color=(255,255,255),
+                                   thickness=1,lineType=cv2.LINE_AA)
+                        cv2.putText(frame,'Score'+str(Score),(100,height-20),fontFace=cv2.FONT_HERSHEY_COMPLEX_SMALL,fontScale=1,color=(255,255,255),
+                                   thickness=1,lineType=cv2.LINE_AA)
+                        Score=Score+1
+                        if(Score>25):
+                            try:
+                                sound.play()
 
-camera.release()
-cv2.destroyAllWindows()
+                            except:
+                                pass
+
+                    # if eyes are open
+                    elif np.argmax(prediction[0])>0.60:
+                        cv2.putText(frame,'open',(10,height-20),fontFace=cv2.FONT_HERSHEY_COMPLEX_SMALL,fontScale=1,color=(255,255,255),
+                                   thickness=1,lineType=cv2.LINE_AA)      
+                        cv2.putText(frame,'Score'+str(Score),(100,height-20),fontFace=cv2.FONT_HERSHEY_COMPLEX_SMALL,fontScale=1,color=(255,255,255),
+                                   thickness=1,lineType=cv2.LINE_AA)
+                        Score = Score-1
+                        openScore = openScore +1
+                        if (Score<0 or openScore >8):
+                            Score=0
+
+
+                cv2.imshow('frame',img)
+
+                if cv2.waitKey(33) & 0xFF==ord('c'):
+                    break
+            cap.release()
+            cv2.destroyAllWindows()
 ```
 
 ## Model Training
-
-As mentioned earlier, the dataset used for training is not publicly available. Therefore, you can use your own dataset and train the model using transfer learning with EfficientNetB5.
-
-1. Prepare your dataset with labeled video samples of drivers and their corresponding drowsiness levels.
-
-2. Update the `config.yaml` file to set the hyperparameters and other configurations for training.
-
-3. Execute the training script:
-
-```bash
-python train.py
-```
-
-4. After training, the script will save the trained model.
+- For training the model on your own dataset you can follow the `Driver_drowsiness_detection.ipynb` file.
 
 ## Evaluation
 
 It is essential to evaluate the trained model's performance on a separate test dataset to assess its accuracy and generalization.
 
-To evaluate the model, you can use the test dataset and the `evaluate.py` script:
-
-```bash
-python evaluate.py
-```
-
-## Contributing
-
-Contributions to this project are welcome. If you find any issues or want to propose enhancements, please open an issue or submit a pull request. Before making significant changes, it's best to discuss your ideas through the issues page.
-
-## License
-
-This project is licensed under the [MIT License](LICENSE).
+Follow the `Driver_drowsiness_detection.ipynb` file for evaluation.
 
 ---
 
