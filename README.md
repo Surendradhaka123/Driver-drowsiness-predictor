@@ -28,8 +28,8 @@ This dataset have two directories one contains 2000 photos with open eyes and an
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/your-username/Driver-Drowsiness-Detection.git
-cd Driver-Drowsiness-Detection
+git clone https://github.com/Surendradhaka123/Driver-drowsiness-predictor.git
+cd Driver-drowsiness-predictor
 ```
 
 2. Set up a virtual environment (optional but recommended):
